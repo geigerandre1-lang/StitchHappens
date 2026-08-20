@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  patterns  Pattern[]
+}
+
+model Pattern {
+  id             String    @id @default(cuid())
+  userId         String?
+  user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  originalText   String
+  language       String    @default("de")
+  meta           String    @default("{}")
+  lastSectionId  String?
+  lastStepId     String?
+  lastSize       String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  sections       Section[]
+}
+
+model Section {
+  id        String  @id @default(cuid())
+  patternId String
+  pattern   Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+  title     String
+  kind      String  @default("work")
+  sizeLabel String?
+  sortOrder Int
+  steps     Step[]
+}
+
+model Step {
+  id                   String    @id @default(cuid())
+  sectionId            String
+  section              Section   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sortOrder            Int
+  label                String
+  rowFrom              Int?
+  rowTo                Int?
+  rowKind              String
+  instruction          String
+  originalInstruction  String    @default("")
+  summary              String    @default("")
+  expectedStitches     Int?
+  abbreviations        Json
+  hints                String    @default("[]")
+  stitchCount          Int       @default(0)
+  repeatCurrent        Int       @default(0)
+  comments             Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  stepId    String
+  step      Step     @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
