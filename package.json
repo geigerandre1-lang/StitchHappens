@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/persist-db.mjs && prisma generate && next build",
+    "build": "node scripts/persist-db.mjs && prisma generate && prisma db push && next build",
     "start": "node scripts/start.mjs",
     "lint": "eslint",
     "postinstall": "prisma generate",

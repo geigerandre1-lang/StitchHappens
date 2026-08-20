@@ -35,6 +35,8 @@ export async function assignLegacyPatterns() {
           data: { userId: user.id },
         });
       } catch (err) {
+        const code = err && typeof err === "object" && "code" in err ? err.code : null;
+        if (code === "P2021") return;
         console.error("[db] Datenbank nicht erreichbar. Prüfe DB_* Variablen oder DATABASE_URL.", err);
       }
     })();
