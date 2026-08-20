@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -19,9 +19,9 @@ model Pattern {
   userId         String?
   user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name           String
-  originalText   String
+  originalText   String    @db.Text
   language       String    @default("de")
-  meta           String    @default("{}")
+  meta           String    @default("{}") @db.Text
   lastSectionId  String?
   lastStepId     String?
   lastSize       String?
@@ -50,12 +50,12 @@ model Step {
   rowFrom              Int?
   rowTo                Int?
   rowKind              String
-  instruction          String
-  originalInstruction  String    @default("")
-  summary              String    @default("")
+  instruction          String    @db.Text
+  originalInstruction  String    @default("") @db.Text
+  summary              String    @default("") @db.Text
   expectedStitches     Int?
   abbreviations        Json
-  hints                String    @default("[]")
+  hints                String    @default("[]") @db.Text
   stitchCount          Int       @default(0)
   repeatCurrent        Int       @default(0)
   comments             Comment[]
@@ -65,7 +65,7 @@ model Comment {
   id        String   @id @default(cuid())
   stepId    String
   step      Step     @relation(fields: [stepId], references: [id], onDelete: Cascade)
-  body      String
+  body      String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

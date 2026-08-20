@@ -1,22 +1,5 @@
-import {
-  appendFileSync,
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-
-const SQLITE_URL = "file:../data/app.db";
-const dataDir = join(process.cwd(), "data");
-mkdirSync(dataDir, { recursive: true });
-const dest = join(dataDir, "app.db");
-const legacy = join(process.cwd(), "prisma", "dev.db");
-if (!existsSync(dest) && existsSync(legacy)) {
-  copyFileSync(legacy, dest);
-  console.log("Bestehende Datenbank nach data/app.db kopiert.");
-}
 
 const envPath = join(process.cwd(), ".env");
 
@@ -25,15 +8,12 @@ function envFileHasDatabaseUrl(contents) {
 }
 
 if (!process.env.DATABASE_URL) {
-  if (!existsSync(envPath)) {
-    writeFileSync(envPath, `DATABASE_URL="${SQLITE_URL}"\n`);
-    console.log("DATABASE_URL in .env gesetzt (Prisma-Build).");
+  if (existsSync(envPath) && envFileHasDatabaseUrl(readFileSync(envPath, "utf8"))) {
+    // Prisma CLI lädt .env selbst
   } else {
-    const contents = readFileSync(envPath, "utf8");
-    if (!envFileHasDatabaseUrl(contents)) {
-      const prefix = contents.length === 0 || contents.endsWith("\n") ? "" : "\n";
-      appendFileSync(envPath, `${prefix}DATABASE_URL="${SQLITE_URL}"\n`);
-      console.log("DATABASE_URL an .env angehängt (Prisma-Build).");
-    }
+    console.error(
+      "DATABASE_URL fehlt. Trage die MySQL-Verbindung in .env oder in den Hostinger-Umgebungsvariablen ein.",
+    );
+    process.exit(1);
   }
 }

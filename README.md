@@ -13,7 +13,7 @@ npm run dev
 
 Dann [http://localhost:3000](http://localhost:3000) öffnen.
 
-Die Datenbank liegt unter `data/app.db` (siehe `DATABASE_URL`). Dieser Ordner bleibt beim Neu-Bauen erhalten, wenn du ihn mitkopierst oder als Volume einhängst.
+Die Datenbank läuft über MySQL (`DATABASE_URL`). Auf Hostinger liegt sie außerhalb des Deploy-Ordners und bleibt beim Neu-Bauen erhalten.
 
 Produktion:
 
