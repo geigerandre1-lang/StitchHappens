@@ -1,9 +1,10 @@
 import { execSync, spawn } from "node:child_process";
+import { resolveDatabaseUrl } from "./resolve-database-url.mjs";
+
+process.env.DATABASE_URL = resolveDatabaseUrl();
+console.log("[start] MySQL-Verbindung aus Umgebungsvariablen aufgebaut");
 
 function runDbPush() {
-  const url = process.env.DATABASE_URL?.trim();
-  if (!url?.startsWith("mysql://")) return;
-
   console.log("[start] Datenbank-Schema anwenden (prisma db push)…");
   execSync("npx prisma db push --skip-generate", {
     stdio: "inherit",
@@ -19,6 +20,7 @@ try {
 }
 
 const port = process.env.PORT ?? "3000";
+console.log(`[start] Next.js startet auf Port ${port}`);
 const child = spawn("npx", ["next", "start", "-p", port], {
   stdio: "inherit",
   env: process.env,

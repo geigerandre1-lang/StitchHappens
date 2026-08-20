@@ -1,8 +1,17 @@
 import { PrismaClient } from "@prisma/client";
+import { logDatabaseTarget, resolveDatabaseUrl } from "@/lib/database-url";
+
+const databaseUrl = resolveDatabaseUrl();
+process.env.DATABASE_URL = databaseUrl;
+logDatabaseTarget(databaseUrl);
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    datasources: { db: { url: databaseUrl } },
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
@@ -26,7 +35,7 @@ export async function assignLegacyPatterns() {
           data: { userId: user.id },
         });
       } catch (err) {
-        console.error("[db] Datenbank nicht erreichbar. Prüfe DATABASE_URL und prisma db push.", err);
+        console.error("[db] Datenbank nicht erreichbar. Prüfe DB_* Variablen oder DATABASE_URL.", err);
       }
     })();
   }
