@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { uploadImageAction } from "@/lib/settings-actions";
+import { uploadImageAction } from "@/lib/image-actions";
 import { mediaUrl } from "@/lib/media-url";
 
 export function ImageUpload({

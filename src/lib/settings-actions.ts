@@ -3,25 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { mediaUrl } from "@/lib/media-url";
-import { saveUserImage } from "@/lib/uploads";
-
-export async function uploadImageAction(formData: FormData) {
-  const user = await requireUser();
-  const file = formData.get("image");
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: "Keine Bilddatei ausgewählt." } as const;
-  }
-
-  try {
-    const path = await saveUserImage(user.id, file);
-    return { path, url: mediaUrl(path) } as const;
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Upload fehlgeschlagen.",
-    } as const;
-  }
-}
 
 export async function listCategoriesAction() {
   const user = await requireUser();
