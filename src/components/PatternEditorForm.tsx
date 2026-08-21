@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { createPatternAction, updatePatternAction } from "@/lib/actions";
-import { blankPattern } from "@/lib/draft";
+import { blankPattern, fillEmptyInstructions } from "@/lib/draft";
 import { PatternDraftEditor } from "@/components/PatternDraftEditor";
 import { ImageUpload } from "@/components/ImageUpload";
 import type { CategoryDTO } from "@/lib/types";
@@ -45,15 +45,13 @@ export function PatternEditorForm({ categories, patternId, initial }: PatternEdi
   const action = isEdit ? updatePatternAction : createPatternAction;
 
   function hasValidSteps(pattern: ParsedPattern) {
-    return pattern.sections.some((section) =>
-      section.steps.some((step) => step.instruction.trim() || step.original.trim()),
-    );
+    return pattern.sections.some((section) => section.steps.length > 0);
   }
 
   function syncDraftJson(form: HTMLFormElement) {
     const field = form.elements.namedItem("draftJson") as HTMLTextAreaElement | null;
     if (field) {
-      field.value = JSON.stringify(draftForSaveRef.current);
+      field.value = JSON.stringify(fillEmptyInstructions(draftForSaveRef.current));
     }
   }
 
@@ -63,7 +61,7 @@ export function PatternEditorForm({ categories, patternId, initial }: PatternEdi
       onSubmit={(event) => {
         if (!hasValidSteps(draftForSaveRef.current)) {
           event.preventDefault();
-          setSubmitError("Mindestens ein Schritt braucht eine Anweisung.");
+          setSubmitError("Lege mindestens einen Schritt an.");
           return;
         }
         setSubmitError(null);

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { patchStep, sanitizeParsedPattern } from "./draft";
+import { blankStep, patchStep, sanitizeParsedPattern } from "./draft";
 import { parsePattern } from "./parser/parsePattern";
 import { PUMPKIN_DE } from "./parser/examples";
 
@@ -23,6 +23,30 @@ describe("sanitizeParsedPattern", () => {
       /keine Schritte/,
     );
   });
+
+  it("defaults empty instructions to Mache on save", () => {
+    const clean = sanitizeParsedPattern(
+      {
+        sections: [
+          {
+            title: "Teil",
+            kind: "work",
+            steps: [{ rowKind: "reihe", rowFrom: 1, rowTo: 1, label: "1. Reihe", instruction: "", original: "" }],
+          },
+        ],
+      },
+      "Test",
+      "de",
+    );
+    assert.equal(clean.sections[0].steps[0].instruction, "Mache");
+  });
+
+  it("starts blank steps as 1. Reihe", () => {
+    const step = blankStep();
+    assert.equal(step.label, "1. Reihe");
+    assert.equal(step.rowFrom, 1);
+    assert.equal(step.rowTo, 1);
+  });
 });
 
 describe("patchStep", () => {
@@ -32,6 +56,18 @@ describe("patchStep", () => {
     assert.ok(row);
     const next = patchStep(row!, { rowFrom: 3, rowTo: 3 }, "de");
     assert.equal(next.label, "3. Reihe");
+  });
+
+  it("updates auto label to a row range", () => {
+    const step = blankStep({ rowKind: "reihe", rowFrom: 1, rowTo: 1 });
+    const next = patchStep(step, { rowTo: 21 }, "de");
+    assert.equal(next.label, "1–21. Reihe");
+  });
+
+  it("fixes legacy Hinweis label on reihe steps when the range changes", () => {
+    const step = blankStep({ rowKind: "reihe", rowFrom: 1, rowTo: 1, label: "Hinweis" });
+    const next = patchStep(step, { rowTo: 21 }, "de");
+    assert.equal(next.label, "1–21. Reihe");
   });
 
   it("keeps a custom label", () => {

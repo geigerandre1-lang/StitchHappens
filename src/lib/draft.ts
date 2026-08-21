@@ -26,7 +26,7 @@ function intOrNull(value: unknown): number | null {
 }
 
 function asRowKind(value: unknown): RowKind {
-  return ROW_KINDS.includes(value as RowKind) ? (value as RowKind) : "hinweis";
+  return ROW_KINDS.includes(value as RowKind) ? (value as RowKind) : "reihe";
 }
 
 function asSectionKind(value: unknown): SectionKind {
@@ -46,10 +46,25 @@ function autoLabel(step: Pick<ParsedStep, "rowKind" | "rowFrom" | "rowTo">): str
   });
 }
 
+function isAutoLabel(step: Pick<ParsedStep, "label" | "rowKind" | "rowFrom" | "rowTo">): boolean {
+  if (step.label === autoLabel(step)) return true;
+  if (
+    (step.rowKind === "reihe" || step.rowKind === "runde") &&
+    /^Hinweis(\s+\d+)?$/.test(step.label)
+  ) {
+    return true;
+  }
+  return false;
+}
+
 export function blankStep(from?: Partial<ParsedStep>): ParsedStep {
   const rowKind = from?.rowKind ?? "reihe";
-  const rowFrom = from?.rowFrom ?? null;
-  const rowTo = from?.rowTo ?? rowFrom;
+  let rowFrom = from?.rowFrom ?? null;
+  let rowTo = from?.rowTo ?? rowFrom;
+  if (rowFrom == null && (rowKind === "reihe" || rowKind === "runde")) {
+    rowFrom = 1;
+    rowTo = 1;
+  }
   const step: ParsedStep = {
     label: from?.label ?? autoLabel({ rowKind, rowFrom, rowTo }),
     summary: "",
@@ -121,7 +136,7 @@ export function patchStep(
   }
   const structureChanged =
     patch.rowKind !== undefined || patch.rowFrom !== undefined || patch.rowTo !== undefined;
-  if (structureChanged && (patch.label === undefined) && step.label === autoLabel(step)) {
+  if (structureChanged && patch.label === undefined && isAutoLabel(step)) {
     next.label = autoLabel(next);
   }
   return refreshStep(next, lang);
@@ -174,21 +189,43 @@ function optionalId(raw: unknown): string | undefined {
   return id || undefined;
 }
 
-function sanitizeStep(raw: unknown, lang: PatternLanguage): ParsedStep | null {
+export function fillEmptyInstructions(pattern: ParsedPattern): ParsedPattern {
+  return {
+    ...pattern,
+    sections: pattern.sections.map((section) => ({
+      ...section,
+      steps: section.steps.map((step) => {
+        const instruction = step.instruction.trim() || step.original.trim() || "Mache";
+        const original = step.original.trim() || step.instruction.trim() || "Mache";
+        return { ...step, instruction, original };
+      }),
+    })),
+  };
+}
+
+function sanitizeStep(raw: unknown, lang: PatternLanguage): ParsedStep {
   const src = (raw ?? {}) as Record<string, unknown>;
-  const instruction = clip(src.instruction, 8000);
-  const original = clip(src.original, 8000);
-  if (!instruction && !original) return null;
+  const instructionRaw = clip(src.instruction, 8000);
+  const originalRaw = clip(src.original, 8000);
+  const instruction = instructionRaw || originalRaw || "Mache";
+  const original = originalRaw || instructionRaw || "Mache";
+  const rowFrom = intOrNull(src.rowFrom);
+  const rowTo = intOrNull(src.rowTo);
+  const rowKind = asRowKind(src.rowKind);
+  const labelInput = clip(src.label, 80) || autoLabel({ rowKind, rowFrom, rowTo });
+  const label = isAutoLabel({ label: labelInput, rowKind, rowFrom, rowTo })
+    ? autoLabel({ rowKind, rowFrom, rowTo })
+    : labelInput;
   return refreshStep(
     {
       id: optionalId(src.id),
-      label: clip(src.label, 80) || "Schritt",
+      label,
       summary: clip(src.summary, 400),
-      original: original || instruction,
-      rowFrom: intOrNull(src.rowFrom),
-      rowTo: intOrNull(src.rowTo),
-      rowKind: asRowKind(src.rowKind),
-      instruction: instruction || original,
+      original,
+      rowFrom,
+      rowTo,
+      rowKind,
+      instruction,
       abbreviations: Array.isArray(src.abbreviations)
         ? src.abbreviations.map(sanitizeAbbr).filter((a) => a.abbr).slice(0, 40)
         : [],
@@ -206,7 +243,7 @@ function sanitizeStep(raw: unknown, lang: PatternLanguage): ParsedStep | null {
 function sanitizeSection(raw: unknown, lang: PatternLanguage): ParsedSection | null {
   const src = (raw ?? {}) as Record<string, unknown>;
   const steps = Array.isArray(src.steps)
-    ? src.steps.map((step) => sanitizeStep(step, lang)).filter((step): step is ParsedStep => Boolean(step))
+    ? src.steps.map((step) => sanitizeStep(step, lang))
     : [];
   if (steps.length === 0) return null;
   const kind = asSectionKind(src.kind);

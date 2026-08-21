@@ -30,7 +30,7 @@ function parsePatternDraft(
         error instanceof Error &&
         error.message.includes("keine Schritte")
       ) {
-        throw new Error("Lege mindestens einen Schritt mit Anweisung an.");
+        throw new Error("Lege mindestens einen Schritt an.");
       }
       throw error;
     }

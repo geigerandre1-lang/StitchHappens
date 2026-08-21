@@ -104,13 +104,18 @@ export function friendlyLabel(opts: {
   untitledIndex: number;
 }): string {
   const { kind, rowFrom, rowTo, untitledIndex } = opts;
-  if (rowFrom != null && rowTo != null) {
+  if (rowFrom != null) {
+    const to = rowTo ?? rowFrom;
     const unit = kind === "runde" ? "Runde" : "Reihe";
-    if (rowFrom === rowTo) return `${rowFrom}. ${unit}`;
-    return `${rowFrom}–${rowTo}. ${unit}`;
+    if (kind === "reihe" || kind === "runde") {
+      if (rowFrom === to) return `${rowFrom}. ${unit}`;
+      return `${rowFrom}–${to}. ${unit}`;
+    }
   }
   if (kind === "anschlag") return untitledIndex > 1 ? `Anschlag ${untitledIndex}` : "Anschlag";
   if (kind === "montage") return untitledIndex > 1 ? `Montage ${untitledIndex}` : "Montage";
+  if (kind === "reihe") return untitledIndex > 1 ? `${untitledIndex}. Reihe` : "1. Reihe";
+  if (kind === "runde") return untitledIndex > 1 ? `${untitledIndex}. Runde` : "1. Runde";
   return untitledIndex > 1 ? `Hinweis ${untitledIndex}` : "Hinweis";
 }
 
