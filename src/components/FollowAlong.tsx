@@ -125,6 +125,14 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
           <h1 className="font-display text-3xl leading-tight text-[#2c241c] sm:text-4xl">
             {pattern.name}
           </h1>
+          {pattern.category ? (
+            <span
+              className="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium text-white"
+              style={{ backgroundColor: pattern.category.color }}
+            >
+              {pattern.category.name}
+            </span>
+          ) : null}
         </div>
         <button
           type="button"
@@ -134,6 +142,17 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
           Neu
         </button>
       </div>
+
+      {pattern.coverImage ? (
+        <div className="overflow-hidden rounded-2xl ring-1 ring-[#eadfce]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={pattern.coverImage}
+            alt=""
+            className="max-h-64 w-full object-contain bg-white"
+          />
+        </div>
+      ) : null}
 
       <GeneralInfo meta={pattern.meta} compact />
 
@@ -264,6 +283,16 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
             </div>
             {activeStep.summary ? (
               <p className="mt-2 text-sm text-[#7a6e62]">{activeStep.summary}</p>
+            ) : null}
+            {activeStep.imageUrl ? (
+              <div className="mt-3 overflow-hidden rounded-xl ring-1 ring-[#eadfce]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={activeStep.imageUrl}
+                  alt=""
+                  className="max-h-80 w-full object-contain bg-white"
+                />
+              </div>
             ) : null}
             <p className="mt-2 text-base leading-relaxed text-[#2c241c] sm:text-lg">
               {activeStep.instruction}

@@ -38,6 +38,9 @@ export function Header({
               <Link href="/glossar" className="rounded-full px-3 py-1.5 text-[#2c241c] hover:bg-[#f3e6d4]">
                 Glossar
               </Link>
+              <Link href="/einstellungen" className="rounded-full px-3 py-1.5 text-[#2c241c] hover:bg-[#f3e6d4]">
+                Einstellungen
+              </Link>
               {isAdmin ? (
                 <Link href="/verwaltung" className="rounded-full px-3 py-1.5 text-[#2c241c] hover:bg-[#f3e6d4]">
                   Benutzer
@@ -74,6 +77,9 @@ export function Header({
           </Link>
           <Link href="/glossar" onClick={() => setOpen(false)} className="min-h-12 rounded-xl px-3 py-3 text-[#2c241c]">
             Glossar
+          </Link>
+          <Link href="/einstellungen" onClick={() => setOpen(false)} className="min-h-12 rounded-xl px-3 py-3 text-[#2c241c]">
+            Einstellungen
           </Link>
           {isAdmin ? (
             <Link

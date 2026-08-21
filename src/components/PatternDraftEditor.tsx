@@ -6,6 +6,7 @@ import { META_LABELS, type PatternMeta } from "@/lib/parser/meta";
 import type { ParsedPattern, ParsedSection, ParsedStep, RowKind, SectionKind } from "@/lib/parser/types";
 import { blankSection, blankStep, moveItem, patchStep } from "@/lib/draft";
 import { HintMarker } from "@/components/HintMarker";
+import { ImageUpload } from "@/components/ImageUpload";
 
 const ROW_KIND_OPTIONS: RowKind[] = ["reihe", "runde", "anschlag", "hinweis", "montage"];
 const SECTION_KIND_OPTIONS: Array<{ value: SectionKind; label: string }> = [
@@ -453,6 +454,16 @@ function StepEditor({
           className={`${fieldClass} font-sans text-base leading-relaxed`}
         />
       </label>
+
+      <div className="mt-2">
+        <ImageUpload
+          label="Schrittbild"
+          value={null}
+          storedPath={step.imageUrl ?? null}
+          onChange={(path) => onChange({ imageUrl: path })}
+        />
+      </div>
+
       {step.original && step.original !== step.instruction ? (
         <p className="mt-1 text-xs text-[#7a6e62]">Original: {step.original}</p>
       ) : null}

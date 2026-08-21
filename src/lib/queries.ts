@@ -3,7 +3,15 @@ import { prisma } from "@/lib/db";
 import type { FoundAbbreviation } from "@/lib/parser";
 import { attachHintsToSteps } from "@/lib/parser/hints";
 import { emptyMeta, isMontageTitle, parseSizeHeader, type PatternMeta } from "@/lib/parser/meta";
-import type { PatternDTO, PatternSummary, SectionDTO, StepDTO } from "@/lib/types";
+import type { CategoryDTO, PatternDTO, PatternSummary, SectionDTO, StepDTO } from "@/lib/types";
+import { mediaUrl } from "@/lib/uploads";
+
+function mapCategory(
+  category: { id: string; name: string; color: string } | null,
+): CategoryDTO | null {
+  if (!category) return null;
+  return { id: category.id, name: category.name, color: category.color };
+}
 
 function asAbbrs(value: unknown): FoundAbbreviation[] {
   if (value == null || value === "") return [];
@@ -61,12 +69,26 @@ function asKind(value: string | null | undefined, title: string): SectionDTO["ki
   return "work";
 }
 
-export async function listPatterns(): Promise<PatternSummary[]> {
+export async function listCategories(): Promise<CategoryDTO[]> {
+  const user = await requireUser();
+  const rows = await prisma.category.findMany({
+    where: { userId: user.id },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: { id: true, name: true, color: true },
+  });
+  return rows;
+}
+
+export async function listPatterns(categoryId?: string | null): Promise<PatternSummary[]> {
   const user = await requireUser();
   const patterns = await prisma.pattern.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      ...(categoryId ? { categoryId } : {}),
+    },
     orderBy: { updatedAt: "desc" },
     include: {
+      category: { select: { id: true, name: true, color: true } },
       sections: {
         include: { steps: true },
       },
@@ -84,6 +106,8 @@ export async function listPatterns(): Promise<PatternSummary[]> {
       id: pattern.id,
       name: pattern.name,
       language: pattern.language,
+      coverImage: pattern.coverImage ? mediaUrl(pattern.coverImage) : null,
+      category: mapCategory(pattern.category),
       createdAt: pattern.createdAt.toISOString(),
       updatedAt: pattern.updatedAt.toISOString(),
       sectionCount: pattern.sections.length,
@@ -98,6 +122,7 @@ export async function getPattern(id: string): Promise<PatternDTO | null> {
   const pattern = await prisma.pattern.findFirst({
     where: { id, userId: user.id },
     include: {
+      category: { select: { id: true, name: true, color: true } },
       sections: {
         orderBy: { sortOrder: "asc" },
         include: {
@@ -131,6 +156,7 @@ export async function getPattern(id: string): Promise<PatternDTO | null> {
         stitchCount: step.stitchCount,
         repeatCurrent: step.repeatCurrent,
         hints: asHints(step.hints),
+        imageUrl: step.imageUrl ? mediaUrl(step.imageUrl) : null,
         comments: step.comments.map((comment) => ({
           id: comment.id,
           body: comment.body,
@@ -161,6 +187,8 @@ export async function getPattern(id: string): Promise<PatternDTO | null> {
     originalText: pattern.originalText,
     language: pattern.language,
     meta: asMeta(pattern.meta),
+    coverImage: pattern.coverImage ? mediaUrl(pattern.coverImage) : null,
+    category: mapCategory(pattern.category),
     lastSectionId: pattern.lastSectionId,
     lastStepId,
     lastSize: pattern.lastSize,

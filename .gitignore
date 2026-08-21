@@ -47,3 +47,6 @@ next-env.d.ts
 /data/*.db
 /data/*.db-journal
 !/data/.gitkeep
+
+# uploaded images (local dev)
+/uploads/

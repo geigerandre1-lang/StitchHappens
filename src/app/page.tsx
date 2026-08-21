@@ -1,11 +1,19 @@
 import Link from "next/link";
 import { PatternCard } from "@/components/PatternCard";
-import { listPatterns } from "@/lib/queries";
+import { listCategories, listPatterns } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const patterns = await listPatterns();
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ kategorie?: string }>;
+}) {
+  const { kategorie } = await searchParams;
+  const [patterns, categories] = await Promise.all([
+    listPatterns(kategorie || null),
+    listCategories(),
+  ]);
 
   return (
     <div>
@@ -25,9 +33,35 @@ export default async function HomePage() {
         </Link>
       </div>
 
+      {categories.length > 0 ? (
+        <div className="mb-6 flex flex-wrap gap-2">
+          <Link
+            href="/"
+            className={`min-h-10 rounded-full px-3 py-2 text-sm ${
+              !kategorie ? "bg-[#2c241c] text-white" : "bg-[#f3e6d4] text-[#2c241c]"
+            }`}
+          >
+            Alle
+          </Link>
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/?kategorie=${cat.id}`}
+              className={`min-h-10 rounded-full px-3 py-2 text-sm ${
+                kategorie === cat.id ? "bg-[#2c241c] text-white" : "bg-[#f3e6d4] text-[#2c241c]"
+              }`}
+            >
+              {cat.name}
+            </Link>
+          ))}
+        </div>
+      ) : null}
+
       {patterns.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#eadfce] bg-[#fffbf5] p-10 text-center">
-          <p className="text-[#7a6e62]">Noch keine Anleitungen gespeichert.</p>
+          <p className="text-[#7a6e62]">
+            {kategorie ? "In dieser Kategorie noch keine Anleitungen." : "Noch keine Anleitungen gespeichert."}
+          </p>
           <Link
             href="/anleitungen/neu"
             className="mt-4 inline-block rounded-full bg-[#c45c26] px-4 py-2 text-sm text-white"

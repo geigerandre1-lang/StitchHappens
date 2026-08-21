@@ -62,6 +62,7 @@ export function blankStep(from?: Partial<ParsedStep>): ParsedStep {
     expectedStitches: from?.expectedStitches ?? null,
     rangeNote: null,
     hints: from?.hints ?? [],
+    imageUrl: from?.imageUrl ?? null,
   };
   return refreshStep(step, "de");
 }
@@ -72,6 +73,17 @@ export function blankSection(): ParsedSection {
     kind: "work",
     sizeLabel: null,
     steps: [blankStep()],
+  };
+}
+
+export function blankPattern(name?: string): ParsedPattern {
+  return {
+    suggestedName: name ?? null,
+    language: "de",
+    meta: emptyMeta(),
+    sections: [blankSection()],
+    coverImage: null,
+    categoryId: null,
   };
 }
 
@@ -179,6 +191,7 @@ function sanitizeStep(raw: unknown, lang: PatternLanguage): ParsedStep | null {
       hints: Array.isArray(src.hints)
         ? src.hints.map((item) => clip(item, 8000)).filter(Boolean).slice(0, 20)
         : [],
+      imageUrl: clip(src.imageUrl, 500) || null,
     },
     lang,
   );
@@ -221,5 +234,7 @@ export function sanitizeParsedPattern(
     language,
     meta: sanitizeMeta(src.meta),
     sections,
+    coverImage: clip(src.coverImage, 500) || null,
+    categoryId: clip(src.categoryId, 80) || null,
   };
 }

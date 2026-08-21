@@ -22,6 +22,7 @@ export type ParsedStep = {
   expectedStitches: number | null;
   rangeNote: string | null;
   hints: string[];
+  imageUrl?: string | null;
 };
 
 export type SectionKind = "work" | "montage" | "size";
@@ -38,6 +39,8 @@ export type ParsedPattern = {
   language: PatternLanguage;
   meta: PatternMeta;
   sections: ParsedSection[];
+  coverImage?: string | null;
+  categoryId?: string | null;
 };
 
 export type StitchDef = {

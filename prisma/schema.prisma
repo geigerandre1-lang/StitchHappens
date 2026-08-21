@@ -8,20 +8,37 @@ datasource db {
 }
 
 model User {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  createdAt  DateTime   @default(now())
+  patterns   Pattern[]
+  categories Category[]
+}
+
+model Category {
   id        String    @id @default(cuid())
-  name      String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  color     String    @default("#c45c26")
+  sortOrder Int       @default(0)
   createdAt DateTime  @default(now())
   patterns  Pattern[]
+
+  @@unique([userId, name])
 }
 
 model Pattern {
   id             String    @id @default(cuid())
   userId         String?
   user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   name           String
   originalText   String    @db.Text
   language       String    @default("de")
   meta           String    @default("{}") @db.Text
+  coverImage     String?   @db.Text
   lastSectionId  String?
   lastStepId     String?
   lastSize       String?
@@ -56,6 +73,7 @@ model Step {
   expectedStitches     Int?
   abbreviations        Json
   hints                String    @default("[]") @db.Text
+  imageUrl             String?   @db.Text
   stitchCount          Int       @default(0)
   repeatCurrent        Int       @default(0)
   comments             Comment[]

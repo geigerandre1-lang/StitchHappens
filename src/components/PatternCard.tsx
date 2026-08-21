@@ -39,16 +39,34 @@ export function PatternCard({ pattern }: { pattern: PatternSummary }) {
 
   return (
     <>
-      <article className="flex flex-col rounded-2xl border border-[#eadfce] bg-[#fffbf5] p-5 shadow-sm">
+      <article className="flex flex-col overflow-hidden rounded-2xl border border-[#eadfce] bg-[#fffbf5] shadow-sm">
+        {pattern.coverImage ? (
+          <div className="aspect-[16/10] bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={pattern.coverImage}
+              alt=""
+              className="h-full w-full object-contain"
+            />
+          </div>
+        ) : null}
+        <div className="flex flex-1 flex-col p-5">
         <button
           type="button"
           onClick={() => setOpen(true)}
           className="text-left"
         >
           <h2 className="font-display text-2xl text-[#2c241c]">{pattern.name}</h2>
+          {pattern.category ? (
+            <span
+              className="mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white"
+              style={{ backgroundColor: pattern.category.color }}
+            >
+              {pattern.category.name}
+            </span>
+          ) : null}
           <p className="mt-2 text-sm text-[#7a6e62]">
-            {pattern.sectionCount} Teile · {pattern.stepCount} Schritte ·{" "}
-            {pattern.language === "en" ? "EN-Quelle" : "DE-Quelle"}
+            {pattern.sectionCount} Teile · {pattern.stepCount} Schritte
           </p>
           <p className="mt-1 text-xs text-[#9a8d7e]">
             Aktualisiert {formatDate(pattern.updatedAt)}
@@ -71,6 +89,7 @@ export function PatternCard({ pattern }: { pattern: PatternSummary }) {
           >
             Löschen
           </button>
+        </div>
         </div>
       </article>
 

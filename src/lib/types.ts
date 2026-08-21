@@ -1,6 +1,12 @@
 import type { FoundAbbreviation } from "@/lib/parser";
 import type { PatternMeta } from "@/lib/parser/meta";
 
+export type CategoryDTO = {
+  id: string;
+  name: string;
+  color: string;
+};
+
 export type CommentDTO = {
   id: string;
   body: string;
@@ -23,6 +29,7 @@ export type StepDTO = {
   stitchCount: number;
   repeatCurrent: number;
   hints: string[];
+  imageUrl: string | null;
   comments: CommentDTO[];
 };
 
@@ -41,6 +48,8 @@ export type PatternDTO = {
   originalText: string;
   language: string;
   meta: PatternMeta;
+  coverImage: string | null;
+  category: CategoryDTO | null;
   lastSectionId: string | null;
   lastStepId: string | null;
   lastSize: string | null;
@@ -53,6 +62,8 @@ export type PatternSummary = {
   id: string;
   name: string;
   language: string;
+  coverImage: string | null;
+  category: CategoryDTO | null;
   createdAt: string;
   updatedAt: string;
   sectionCount: number;
