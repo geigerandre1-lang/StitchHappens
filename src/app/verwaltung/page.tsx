@@ -1,4 +1,5 @@
 import { adminLogin, adminLogout, createUserAction, deleteUserAction } from "@/lib/auth-actions";
+import { RedirectForm } from "@/components/RedirectForm";
 import { isAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -23,7 +24,7 @@ export default async function AdminPage({
     return (
       <div className="mx-auto max-w-sm pt-8">
         <h1 className="font-display text-3xl">Zugang</h1>
-        <form action={adminLogin} className="mt-6 space-y-4">
+        <RedirectForm action={adminLogin} className="mt-6 space-y-4">
           <label className="block">
             <span className="text-sm font-medium text-[#2c241c]">Kennwort</span>
             <input
@@ -41,7 +42,7 @@ export default async function AdminPage({
           >
             Öffnen
           </button>
-        </form>
+        </RedirectForm>
       </div>
     );
   }
@@ -61,14 +62,14 @@ export default async function AdminPage({
             Anleitungen mit.
           </p>
         </div>
-        <form action={adminLogout}>
+        <RedirectForm action={adminLogout}>
           <button type="submit" className="min-h-11 rounded-full px-3 text-sm text-[#7a6e62]">
             Schließen
           </button>
-        </form>
+        </RedirectForm>
       </div>
 
-      <form action={createUserAction} className="mt-6 flex gap-2">
+      <RedirectForm action={createUserAction} className="mt-6 flex gap-2">
         <input
           name="name"
           required
@@ -81,7 +82,7 @@ export default async function AdminPage({
         >
           Anlegen
         </button>
-      </form>
+      </RedirectForm>
       {message ? <p className="mt-2 text-sm text-[#8a3d16]">{message}</p> : null}
 
       <ul className="mt-6 space-y-2">
@@ -101,7 +102,7 @@ export default async function AdminPage({
                   {user._count.patterns} Anleitung{user._count.patterns === 1 ? "" : "en"}
                 </span>
               </span>
-              <form action={deleteUserAction}>
+              <RedirectForm action={deleteUserAction}>
                 <input type="hidden" name="id" value={user.id} />
                 <button
                   type="submit"
@@ -109,7 +110,7 @@ export default async function AdminPage({
                 >
                   Löschen
                 </button>
-              </form>
+              </RedirectForm>
             </li>
           ))
         )}

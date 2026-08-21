@@ -1,4 +1,5 @@
 import { loginWithName } from "@/lib/auth-actions";
+import { RedirectForm } from "@/components/RedirectForm";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ export default async function LoginPage({
       <p className="mt-2 text-[#7a6e62]">
         Gib deinen Namen ein. Jede Person sieht nur die eigenen Anleitungen.
       </p>
-      <form action={loginWithName} className="mt-8 space-y-4">
+      <RedirectForm action={loginWithName} className="mt-8 space-y-4">
         <label className="block">
           <span className="text-sm font-medium text-[#2c241c]">Name</span>
           <input
@@ -41,7 +42,7 @@ export default async function LoginPage({
         >
           Weiter
         </button>
-      </form>
+      </RedirectForm>
       <p className="mt-16 text-center text-[11px] text-[#eadfce]">
         <Link href="/verwaltung" className="hover:text-[#7a6e62]">
           ·
