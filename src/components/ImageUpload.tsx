@@ -31,7 +31,7 @@ export function ImageUpload({
       const result = await uploadImageAction(fd);
       setBusy(false);
       if ("error" in result) {
-        setError(result.error);
+        setError(result.error ?? "Upload fehlgeschlagen.");
         return;
       }
       onChange(result.path, result.url);

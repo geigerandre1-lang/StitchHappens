@@ -20,6 +20,7 @@ function step(id: string, label: string): StepDTO {
     stitchCount: 0,
     repeatCurrent: 1,
     hints: [],
+    imageUrl: null,
     comments: [],
   };
 }
@@ -41,6 +42,8 @@ function pattern(partial: Partial<PatternDTO> & Pick<PatternDTO, "sections">): P
     originalText: "",
     language: "de",
     meta: { ...emptyMeta(), sizes: ["S", "M"] },
+    coverImage: null,
+    category: null,
     lastSectionId: null,
     lastStepId: null,
     lastSize: null,

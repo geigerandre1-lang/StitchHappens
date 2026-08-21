@@ -23,7 +23,7 @@ export function CategoryManager({ initial }: { initial: CategoryDTO[] }) {
     startTransition(async () => {
       const result = await createCategoryAction(fd);
       if ("error" in result) {
-        setError(result.error);
+        setError(result.error ?? "Unbekannter Fehler");
         return;
       }
       setCategories((prev) => [...prev, { id: result.id, name: result.name, color: result.color }]);
@@ -36,7 +36,7 @@ export function CategoryManager({ initial }: { initial: CategoryDTO[] }) {
     startTransition(async () => {
       const result = await deleteCategoryAction(id);
       if ("error" in result) {
-        setError(result.error);
+        setError(result.error ?? "Unbekannter Fehler");
         return;
       }
       setCategories((prev) => prev.filter((c) => c.id !== id));
@@ -47,7 +47,7 @@ export function CategoryManager({ initial }: { initial: CategoryDTO[] }) {
     startTransition(async () => {
       const result = await renameCategoryAction(id, nextName);
       if ("error" in result) {
-        setError(result.error);
+        setError(result.error ?? "Unbekannter Fehler");
         return;
       }
       setCategories((prev) =>
