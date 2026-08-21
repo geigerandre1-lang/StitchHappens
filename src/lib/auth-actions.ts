@@ -28,7 +28,7 @@ export async function loginWithName(formData: FormData): Promise<string> {
   return "/";
 }
 
-export async function logoutAction(): Promise<string> {
+export async function logoutAction(_formData?: FormData): Promise<string> {
   await clearUserCookie();
   return "/anmelden";
 }
@@ -43,7 +43,7 @@ export async function adminLogin(formData: FormData): Promise<string> {
   return "/verwaltung";
 }
 
-export async function adminLogout(): Promise<string> {
+export async function adminLogout(_formData?: FormData): Promise<string> {
   await clearAdminCookie();
   return "/anmelden";
 }

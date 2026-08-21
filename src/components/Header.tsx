@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { RedirectForm } from "@/components/RedirectForm";
 import { logoutAction } from "@/lib/auth-actions";
 
 export function Header({
@@ -52,11 +53,11 @@ export function Header({
               >
                 Neue Anleitung
               </Link>
-              <form action={logoutAction}>
+              <RedirectForm action={logoutAction}>
                 <button type="submit" className="rounded-full px-3 py-1.5 text-[#7a6e62] hover:bg-[#f3e6d4]">
                   Abmelden
                 </button>
-              </form>
+              </RedirectForm>
             </nav>
             <button
               type="button"
@@ -97,11 +98,11 @@ export function Header({
           >
             Neue Anleitung
           </Link>
-          <form action={logoutAction}>
+          <RedirectForm action={logoutAction}>
             <button type="submit" className="min-h-12 w-full rounded-xl px-3 py-3 text-left text-[#7a6e62]">
               Abmelden
             </button>
-          </form>
+          </RedirectForm>
         </nav>
       ) : null}
     </header>
