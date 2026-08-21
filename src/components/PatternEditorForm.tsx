@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { createPatternAction, updatePatternAction } from "@/lib/actions";
 import { blankPattern, fillEmptyInstructions } from "@/lib/draft";
@@ -22,6 +23,7 @@ type PatternEditorFormProps = {
 };
 
 export function PatternEditorForm({ categories, patternId, initial }: PatternEditorFormProps) {
+  const router = useRouter();
   const isEdit = Boolean(patternId);
   const [name, setName] = useState(initial?.name ?? "");
   const [categoryId, setCategoryId] = useState(initial?.categoryId ?? "");
@@ -42,8 +44,6 @@ export function PatternEditorForm({ categories, patternId, initial }: PatternEdi
   const draftForSaveRef = useRef(draftForSave);
   draftForSaveRef.current = draftForSave;
 
-  const action = isEdit ? updatePatternAction : createPatternAction;
-
   function hasValidSteps(pattern: ParsedPattern) {
     return pattern.sections.some((section) => section.steps.length > 0);
   }
@@ -55,9 +55,14 @@ export function PatternEditorForm({ categories, patternId, initial }: PatternEdi
     }
   }
 
+  async function submit(formData: FormData) {
+    const path = isEdit ? await updatePatternAction(formData) : await createPatternAction(formData);
+    router.push(path);
+  }
+
   return (
     <form
-      action={action}
+      action={submit}
       onSubmit={(event) => {
         if (!hasValidSteps(draftForSaveRef.current)) {
           event.preventDefault();

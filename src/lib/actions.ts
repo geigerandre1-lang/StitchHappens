@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { sanitizeParsedPattern } from "@/lib/draft";
@@ -48,7 +47,7 @@ async function ownedPattern(patternId: string) {
   return { user, pattern };
 }
 
-export async function createPatternAction(formData: FormData) {
+export async function createPatternAction(formData: FormData): Promise<string> {
   const user = await requireUser();
   const name = String(formData.get("name") || "").trim();
   const manualOnly = formData.get("manualOnly") === "1";
@@ -116,10 +115,10 @@ export async function createPatternAction(formData: FormData) {
   });
 
   revalidatePath("/");
-  redirect(`/anleitungen/${pattern.id}`);
+  return `/anleitungen/${pattern.id}`;
 }
 
-export async function updatePatternAction(formData: FormData) {
+export async function updatePatternAction(formData: FormData): Promise<string> {
   const patternId = String(formData.get("patternId") || "").trim();
   if (!patternId) throw new Error("Anleitung nicht gefunden.");
 
@@ -255,10 +254,10 @@ export async function updatePatternAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath(`/anleitungen/${patternId}`);
-  redirect(`/anleitungen/${patternId}`);
+  return `/anleitungen/${patternId}`;
 }
 
-export async function duplicatePatternAction(patternId: string) {
+export async function duplicatePatternAction(patternId: string): Promise<string> {
   const { user } = await ownedPattern(patternId);
   const source = await prisma.pattern.findFirst({
     where: { id: patternId, userId: user.id },
@@ -312,7 +311,7 @@ export async function duplicatePatternAction(patternId: string) {
   });
 
   revalidatePath("/");
-  redirect(`/anleitungen/${copy.id}`);
+  return `/anleitungen/${copy.id}`;
 }
 
 export async function deletePatternAction(patternId: string) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   addStepComment,
   deleteStepComment,
@@ -26,6 +27,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
+  const router = useRouter();
   const workSections = pattern.sections.filter((s) => s.kind === "work");
   const montageSections = pattern.sections.filter((s) => s.kind === "montage");
   const sizeSections = pattern.sections.filter((s) => s.kind === "size");
@@ -113,7 +115,8 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
 
   function handleDuplicate() {
     startDuplicate(async () => {
-      await duplicatePatternAction(pattern.id);
+      const path = await duplicatePatternAction(pattern.id);
+      router.push(path);
     });
   }
 

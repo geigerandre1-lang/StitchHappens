@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { createPatternAction } from "@/lib/actions";
 import { extractPdfText } from "@/lib/pdf";
@@ -19,6 +20,7 @@ import {
 import type { ParsedPattern, ParsedStep, RowKind } from "@/lib/parser/types";
 
 export function AutoImportPatternForm() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [draft, setDraft] = useState<ParsedPattern | null>(null);
@@ -74,8 +76,13 @@ export function AutoImportPatternForm() {
     setSectionIndex(0);
   }
 
+  async function submit(formData: FormData) {
+    const path = await createPatternAction(formData);
+    router.push(path);
+  }
+
   return (
-    <form action={createPatternAction} className="space-y-6 pb-24 sm:pb-0">
+    <form action={submit} className="space-y-6 pb-24 sm:pb-0">
       <textarea name="draftJson" hidden readOnly value={shown ? JSON.stringify(shown) : ""} />
       <div className={`grid gap-8 ${mode === "edit" ? "" : "lg:grid-cols-2"}`}>
         <div className="space-y-4">

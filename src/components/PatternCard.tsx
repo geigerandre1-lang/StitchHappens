@@ -40,7 +40,8 @@ export function PatternCard({ pattern }: { pattern: PatternSummary }) {
 
   function duplicate() {
     startTransition(async () => {
-      await duplicatePatternAction(pattern.id);
+      const path = await duplicatePatternAction(pattern.id);
+      router.push(path);
     });
   }
 
