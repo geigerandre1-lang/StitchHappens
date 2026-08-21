@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { uploadImageAction } from "@/lib/settings-actions";
-import { mediaUrl } from "@/lib/uploads";
+import { mediaUrl } from "@/lib/media-url";
 
 export function ImageUpload({
   label,

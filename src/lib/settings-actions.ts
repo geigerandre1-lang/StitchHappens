@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { mediaUrl, saveUserImage } from "@/lib/uploads";
+import { mediaUrl } from "@/lib/media-url";
+import { saveUserImage } from "@/lib/uploads";
 
 export async function uploadImageAction(formData: FormData) {
   const user = await requireUser();

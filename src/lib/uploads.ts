@@ -1,3 +1,5 @@
+import "server-only";
+
 import { mkdirSync, writeFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -14,11 +16,6 @@ export function getUploadRoot(): string {
     return resolve(cwd, "../../../..", "uploads");
   }
   return resolve(cwd, "uploads");
-}
-
-export function mediaUrl(relativePath: string): string {
-  const normalized = relativePath.replace(/\\/g, "/").replace(/^\/+/, "");
-  return `/api/media/${normalized}`;
 }
 
 export async function saveUserImage(userId: string, file: File): Promise<string> {

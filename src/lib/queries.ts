@@ -4,7 +4,7 @@ import type { FoundAbbreviation } from "@/lib/parser";
 import { attachHintsToSteps } from "@/lib/parser/hints";
 import { emptyMeta, isMontageTitle, parseSizeHeader, type PatternMeta } from "@/lib/parser/meta";
 import type { CategoryDTO, PatternDTO, PatternSummary, SectionDTO, StepDTO } from "@/lib/types";
-import { mediaUrl } from "@/lib/uploads";
+import { mediaUrl } from "@/lib/media-url";
 
 function mapCategory(
   category: { id: string; name: string; color: string } | null,
