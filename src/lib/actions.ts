@@ -299,7 +299,7 @@ export async function duplicatePatternAction(patternId: string) {
               originalInstruction: step.originalInstruction,
               summary: step.summary,
               expectedStitches: step.expectedStitches,
-              abbreviations: step.abbreviations,
+              abbreviations: JSON.parse(JSON.stringify(step.abbreviations)),
               hints: step.hints,
               imageUrl: step.imageUrl,
               stitchCount: 0,
