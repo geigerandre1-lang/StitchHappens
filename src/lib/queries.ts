@@ -5,6 +5,8 @@ import { attachHintsToSteps } from "@/lib/parser/hints";
 import { emptyMeta, isMontageTitle, parseSizeHeader, type PatternMeta } from "@/lib/parser/meta";
 import type { CategoryDTO, PatternDTO, PatternSummary, SectionDTO, StepDTO } from "@/lib/types";
 import { mediaUrl } from "@/lib/media-url";
+import { patternToDraft } from "@/lib/pattern-to-draft";
+import type { ParsedPattern } from "@/lib/parser/types";
 
 function mapCategory(
   category: { id: string; name: string; color: string } | null,
@@ -195,5 +197,37 @@ export async function getPattern(id: string): Promise<PatternDTO | null> {
     createdAt: pattern.createdAt.toISOString(),
     updatedAt: pattern.updatedAt.toISOString(),
     sections,
+  };
+}
+
+export type PatternEditData = {
+  id: string;
+  name: string;
+  categoryId: string | null;
+  coverImage: string | null;
+  draft: ParsedPattern;
+};
+
+export async function getPatternForEdit(id: string): Promise<PatternEditData | null> {
+  const user = await requireUser();
+  const pattern = await prisma.pattern.findFirst({
+    where: { id, userId: user.id },
+    include: {
+      sections: {
+        orderBy: { sortOrder: "asc" },
+        include: {
+          steps: { orderBy: { sortOrder: "asc" } },
+        },
+      },
+    },
+  });
+  if (!pattern) return null;
+
+  return {
+    id: pattern.id,
+    name: pattern.name,
+    categoryId: pattern.categoryId,
+    coverImage: pattern.coverImage,
+    draft: patternToDraft(pattern),
   };
 }

@@ -11,6 +11,7 @@ export type FoundAbbreviation = {
 };
 
 export type ParsedStep = {
+  id?: string;
   label: string;
   summary: string;
   original: string;
@@ -28,6 +29,7 @@ export type ParsedStep = {
 export type SectionKind = "work" | "montage" | "size";
 
 export type ParsedSection = {
+  id?: string;
   title: string;
   kind: SectionKind;
   sizeLabel: string | null;

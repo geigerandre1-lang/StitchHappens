@@ -93,7 +93,7 @@ export function PatternDraftEditor({
     const prev = section?.steps[after];
     const rowFrom = prev?.rowTo != null ? prev.rowTo + 1 : prev?.rowFrom ?? null;
     const nextStep = blankStep({
-      rowKind: prev?.rowKind === "hinweis" ? "reihe" : prev?.rowKind ?? "reihe",
+      rowKind: "reihe",
       rowFrom,
       rowTo: rowFrom,
     });

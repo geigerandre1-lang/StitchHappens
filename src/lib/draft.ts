@@ -47,7 +47,7 @@ function autoLabel(step: Pick<ParsedStep, "rowKind" | "rowFrom" | "rowTo">): str
 }
 
 export function blankStep(from?: Partial<ParsedStep>): ParsedStep {
-  const rowKind = from?.rowKind ?? "hinweis";
+  const rowKind = from?.rowKind ?? "reihe";
   const rowFrom = from?.rowFrom ?? null;
   const rowTo = from?.rowTo ?? rowFrom;
   const step: ParsedStep = {
@@ -169,6 +169,11 @@ function sanitizeMeta(raw: unknown): PatternMeta {
   return meta;
 }
 
+function optionalId(raw: unknown): string | undefined {
+  const id = clip(raw, 80);
+  return id || undefined;
+}
+
 function sanitizeStep(raw: unknown, lang: PatternLanguage): ParsedStep | null {
   const src = (raw ?? {}) as Record<string, unknown>;
   const instruction = clip(src.instruction, 8000);
@@ -176,6 +181,7 @@ function sanitizeStep(raw: unknown, lang: PatternLanguage): ParsedStep | null {
   if (!instruction && !original) return null;
   return refreshStep(
     {
+      id: optionalId(src.id),
       label: clip(src.label, 80) || "Schritt",
       summary: clip(src.summary, 400),
       original: original || instruction,
@@ -206,6 +212,7 @@ function sanitizeSection(raw: unknown, lang: PatternLanguage): ParsedSection | n
   const kind = asSectionKind(src.kind);
   const sizeLabel = kind === "size" ? clip(src.sizeLabel, 24) || null : clip(src.sizeLabel, 24) || null;
   return {
+    id: optionalId(src.id),
     title: clip(src.title, 80) || "Teil",
     kind,
     sizeLabel: kind === "size" ? sizeLabel || "—" : sizeLabel,

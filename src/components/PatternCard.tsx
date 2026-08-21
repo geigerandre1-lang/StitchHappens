@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { deletePatternAction, resetPatternProgress } from "@/lib/actions";
+import { deletePatternAction, duplicatePatternAction, resetPatternProgress } from "@/lib/actions";
 import type { PatternSummary } from "@/lib/types";
 
 function formatDate(value: string) {
@@ -34,6 +35,12 @@ export function PatternCard({ pattern }: { pattern: PatternSummary }) {
     startTransition(async () => {
       await deletePatternAction(pattern.id);
       router.refresh();
+    });
+  }
+
+  function duplicate() {
+    startTransition(async () => {
+      await duplicatePatternAction(pattern.id);
     });
   }
 
@@ -83,6 +90,14 @@ export function PatternCard({ pattern }: { pattern: PatternSummary }) {
           </button>
           <button
             type="button"
+            onClick={duplicate}
+            disabled={pending}
+            className="rounded-full px-4 py-2 text-sm text-[#7a6e62] hover:bg-[#f3e6d4] disabled:opacity-70"
+          >
+            {pending ? "Kopiert…" : "Kopieren"}
+          </button>
+          <button
+            type="button"
             onClick={remove}
             disabled={pending}
             className="rounded-full px-4 py-2 text-sm text-[#7a6e62] hover:bg-[#f3e6d4]"
@@ -122,6 +137,29 @@ export function PatternCard({ pattern }: { pattern: PatternSummary }) {
                 </span>
                 <span className="block text-sm text-white/80">
                   Zähler zurücksetzen und am Anfang starten
+                </span>
+              </button>
+              <Link
+                href={`/anleitungen/${pattern.id}/bearbeiten`}
+                onClick={() => setOpen(false)}
+                className="rounded-xl bg-white px-4 py-3 text-left ring-1 ring-[#eadfce] hover:bg-[#f3e6d4]"
+              >
+                <span className="block font-medium text-[#2c241c]">Bearbeiten</span>
+                <span className="block text-sm text-[#7a6e62]">
+                  Name, Schritte und Bilder ändern
+                </span>
+              </Link>
+              <button
+                type="button"
+                onClick={duplicate}
+                disabled={pending}
+                className="rounded-xl bg-white px-4 py-3 text-left ring-1 ring-[#eadfce] hover:bg-[#f3e6d4] disabled:opacity-70"
+              >
+                <span className="block font-medium text-[#2c241c]">
+                  {pending ? "Wird kopiert…" : "Kopieren"}
+                </span>
+                <span className="block text-sm text-[#7a6e62]">
+                  Duplikat ohne Fortschritt und Kommentare
                 </span>
               </button>
               <button

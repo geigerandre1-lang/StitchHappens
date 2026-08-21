@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import Link from "next/link";
 import {
   addStepComment,
   deleteStepComment,
+  duplicatePatternAction,
   resetPatternProgress,
   saveLastOpened,
   saveStepProgress,
@@ -49,6 +51,7 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
     return map;
   });
   const [, startTransition] = useTransition();
+  const [duplicating, startDuplicate] = useTransition();
   const skipLastOpenedSave = useRef(true);
   const activeStepBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -108,6 +111,12 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
     window.location.reload();
   }
 
+  function handleDuplicate() {
+    startDuplicate(async () => {
+      await duplicatePatternAction(pattern.id);
+    });
+  }
+
   if (!section || !activeStep) {
     return <p>Diese Anleitung hat noch keine Schritte.</p>;
   }
@@ -134,13 +143,29 @@ export function FollowAlong({ pattern }: { pattern: PatternDTO }) {
             </span>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="min-h-11 shrink-0 rounded-full border border-[#eadfce] px-3 py-2 text-sm text-[#2c241c]"
-        >
-          Neu
-        </button>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          <Link
+            href={`/anleitungen/${pattern.id}/bearbeiten`}
+            className="min-h-11 rounded-full border border-[#eadfce] px-3 py-2 text-center text-sm text-[#2c241c] hover:bg-[#f3e6d4]"
+          >
+            Bearbeiten
+          </Link>
+          <button
+            type="button"
+            onClick={handleDuplicate}
+            disabled={duplicating}
+            className="min-h-11 rounded-full border border-[#eadfce] px-3 py-2 text-sm text-[#2c241c] disabled:opacity-70"
+          >
+            {duplicating ? "Kopiert…" : "Kopieren"}
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="min-h-11 rounded-full border border-[#eadfce] px-3 py-2 text-sm text-[#2c241c]"
+          >
+            Neu
+          </button>
+        </div>
       </div>
 
       {pattern.coverImage ? (
